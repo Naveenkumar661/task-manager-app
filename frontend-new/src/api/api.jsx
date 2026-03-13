@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: 'http://localhost:8000/api',
+  baseURL: 'https://task-manager-app-sbad.onrender.com/api',
   headers: { 'Content-Type': 'application/json' },
 });
 
@@ -21,7 +21,7 @@ API.interceptors.response.use(
       original._retry = true;
       try {
         const refresh = localStorage.getItem('refresh_token');
-        const { data } = await axios.post('http://localhost:8000/api/token/refresh/', { refresh });
+        const { data } = await axios.post('https://task-manager-app-sbad.onrender.com/api/token/refresh/', { refresh });
         localStorage.setItem('access_token', data.access);
         original.headers.Authorization = `Bearer ${data.access}`;
         return API(original);
