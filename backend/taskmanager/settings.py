@@ -95,7 +95,7 @@ SIMPLE_JWT = {
 
 CORS_ALLOWED_ORIGINS = config(
     'CORS_ALLOWED_ORIGINS',
-    default='http://localhost:3000,http://localhost:5173'
+    default='http://localhost:3000,http://localhost:5173,https://task-manager-frontend-eight-ashen.vercel.app'
 ).split(',')
 
 CORS_ALLOW_CREDENTIALS = True
