@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { login as apiLogin, register as apiRegister, logout as apiLogout } from '../api/api';
+import { login as apiLogin, register as apiRegister } from '../api/api';
+import API from '../api/api';
 
 const AuthContext = createContext(null);
 
@@ -8,7 +9,6 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Load user from localStorage on app start
     const savedUser = localStorage.getItem('user');
     const token = localStorage.getItem('access_token');
     if (savedUser && token) {
@@ -38,7 +38,9 @@ export function AuthProvider({ children }) {
   const logout = async () => {
     try {
       const refresh = localStorage.getItem('refresh_token');
-      await apiLogout({ refresh });
+      if (refresh) {
+        await API.post('/logout/', { refresh });
+      }
     } catch {}
     localStorage.clear();
     setUser(null);

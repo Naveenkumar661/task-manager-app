@@ -15,7 +15,6 @@ export default function Dashboard() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editTask, setEditTask] = useState(null);
 
-  // Filters
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [filterPriority, setFilterPriority] = useState('');
@@ -62,7 +61,7 @@ export default function Dashboard() {
   return (
     <div className={`app-shell ${darkMode ? 'dark' : 'light'}`}>
 
-      {/* ── Sidebar (Desktop) ── */}
+      {/* ── Sidebar (Desktop only) ── */}
       <aside className="sidebar">
         <div className="sb-logo">Task<span>Flow</span></div>
         <div className="sb-section">
@@ -80,17 +79,27 @@ export default function Dashboard() {
         </div>
       </aside>
 
-      {/* ── Main ── */}
+      {/* ── Main Content ── */}
       <main className="main-content">
 
-        {/* Mobile Top Bar */}
+        {/* ── Mobile Top Bar ── */}
         <div className="mobile-topbar">
-          <div className="sb-logo" style={{ marginBottom: 0 }}>Task<span>Flow</span></div>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button className="icon-btn" onClick={() => setDarkMode(!darkMode)} style={{ fontSize: 18 }}>
+          <div className="sb-logo" style={{ padding: 0, marginBottom: 0 }}>Task<span>Flow</span></div>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <button
+              className="btn-secondary"
+              style={{ padding: '6px 12px', fontSize: 13 }}
+              onClick={() => setDarkMode(!darkMode)}
+            >
               {darkMode ? '☀️' : '🌙'}
             </button>
-            <button className="icon-btn" onClick={handleLogout} style={{ fontSize: 18 }}>🚪</button>
+            <button
+              className="btn-secondary"
+              style={{ padding: '6px 14px', fontSize: 13, color: 'var(--danger)', borderColor: 'var(--danger)' }}
+              onClick={handleLogout}
+            >
+              Logout
+            </button>
           </div>
         </div>
 
@@ -121,8 +130,10 @@ export default function Dashboard() {
         {/* Filters */}
         <div className="filters-row">
           <input
-            className="search-input" placeholder="🔍 Search tasks..."
-            value={search} onChange={(e) => setSearch(e.target.value)}
+            className="search-input"
+            placeholder="🔍 Search tasks..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
           />
           <select className="select-field" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
             <option value="">All Status</option>
@@ -136,15 +147,17 @@ export default function Dashboard() {
             <option value="low">Low</option>
           </select>
           {(search || filterStatus || filterPriority) && (
-            <button className="btn-secondary" onClick={() => { setSearch(''); setFilterStatus(''); setFilterPriority(''); setActiveNav('all'); }}>
+            <button className="btn-secondary" onClick={() => {
+              setSearch(''); setFilterStatus(''); setFilterPriority(''); setActiveNav('all');
+            }}>
               Clear
             </button>
           )}
         </div>
 
-        {/* Tasks */}
+        {/* Tasks List */}
         {loading ? (
-          <div className="empty-state">Loading tasks...</div>
+          <div className="empty-state">⏳ Loading tasks...</div>
         ) : tasks.length === 0 ? (
           <div className="empty-state">
             <div style={{ fontSize: 48 }}>📝</div>
@@ -153,7 +166,8 @@ export default function Dashboard() {
               {search || filterStatus || filterPriority ? 'Try clearing filters' : 'Create your first task!'}
             </div>
             {!search && !filterStatus && !filterPriority && (
-              <button className="btn-primary" onClick={openNew} style={{ width: 'auto', marginTop: 18, padding: '10px 24px' }}>
+              <button className="btn-primary" onClick={openNew}
+                style={{ width: 'auto', marginTop: 18, padding: '10px 24px' }}>
                 ＋ Create Task
               </button>
             )}
@@ -177,13 +191,13 @@ export default function Dashboard() {
           <span>⏳</span>
           <span>Pending</span>
         </button>
-        <button className={`mobile-nav-item ${activeNav === 'completed' ? 'active' : ''}`} onClick={() => handleNavClick('completed')}>
-          <span>✅</span>
-          <span>Done</span>
-        </button>
         <button className="mobile-nav-item" onClick={openNew}>
           <span>➕</span>
           <span>New</span>
+        </button>
+        <button className={`mobile-nav-item ${activeNav === 'completed' ? 'active' : ''}`} onClick={() => handleNavClick('completed')}>
+          <span>✅</span>
+          <span>Done</span>
         </button>
         <button className={`mobile-nav-item ${activeNav === 'high' ? 'active' : ''}`} onClick={() => handleNavClick('high')}>
           <span>🔴</span>

@@ -14,7 +14,7 @@ export default function TaskModal({ task, onClose, onSaved }) {
         title: task.title || '',
         description: task.description || '',
         priority: task.priority || 'medium',
-        deadline: task.deadline || '',
+        deadline: task.deadline ? task.deadline.split('T')[0] : '',
         status: task.status || 'pending',
       });
     } else {
@@ -39,7 +39,14 @@ export default function TaskModal({ task, onClose, onSaved }) {
       onSaved();
     } catch (err) {
       const data = err.response?.data;
-      setError(data ? Object.values(data).flat().join(' ') : 'Something went wrong.');
+      if (data) {
+        const messages = Object.entries(data)
+          .map(([key, val]) => `${key}: ${Array.isArray(val) ? val.join(', ') : val}`)
+          .join(' | ');
+        setError(messages);
+      } else {
+        setError('Something went wrong. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -53,21 +60,44 @@ export default function TaskModal({ task, onClose, onSaved }) {
           <button className="modal-close" onClick={onClose}>✕</button>
         </div>
 
-        {error && <div className="error-msg">{error}</div>}
+        {error && <div className="error-msg">⚠️ {error}</div>}
 
         <form onSubmit={submit}>
           <div className="field">
             <label>Title *</label>
-            <input name="title" value={form.title} onChange={handle} placeholder="What needs to be done?" required />
+            <input
+              name="title"
+              value={form.title}
+              onChange={handle}
+              placeholder="What needs to be done?"
+              required
+              autoFocus
+            />
           </div>
+
           <div className="field">
             <label>Description</label>
             <textarea
-              name="description" value={form.description} onChange={handle}
-              placeholder="Add details..." rows={3}
-              style={{ width: '100%', background: 'var(--surface2)', border: '1.5px solid var(--border)', borderRadius: 10, padding: '11px 14px', color: 'var(--text)', fontFamily: 'var(--font-body)', fontSize: 14, outline: 'none', resize: 'vertical' }}
+              name="description"
+              value={form.description}
+              onChange={handle}
+              placeholder="Add details..."
+              rows={3}
+              style={{
+                width: '100%',
+                background: 'var(--surface2)',
+                border: '1.5px solid var(--border)',
+                borderRadius: 10,
+                padding: '11px 14px',
+                color: 'var(--text)',
+                fontFamily: 'var(--font-body)',
+                fontSize: 14,
+                outline: 'none',
+                resize: 'vertical',
+              }}
             />
           </div>
+
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
             <div className="field">
               <label>Priority</label>
@@ -85,13 +115,22 @@ export default function TaskModal({ task, onClose, onSaved }) {
               </select>
             </div>
           </div>
+
           <div className="field">
             <label>Deadline</label>
-            <input name="deadline" type="date" value={form.deadline} onChange={handle}
-              style={{ colorScheme: 'dark' }} />
+            <input
+              name="deadline"
+              type="date"
+              value={form.deadline}
+              onChange={handle}
+              style={{ colorScheme: 'dark' }}
+            />
           </div>
+
           <div style={{ display: 'flex', gap: 10, marginTop: 6 }}>
-            <button type="button" onClick={onClose} className="btn-secondary">Cancel</button>
+            <button type="button" onClick={onClose} className="btn-secondary">
+              Cancel
+            </button>
             <button className="btn-primary" disabled={loading} style={{ flex: 1, marginTop: 0 }}>
               {loading ? 'Saving...' : task?.id ? 'Update Task' : 'Create Task'}
             </button>
