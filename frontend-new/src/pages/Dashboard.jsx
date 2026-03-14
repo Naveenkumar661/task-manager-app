@@ -20,6 +20,7 @@ export default function Dashboard() {
   const [filterStatus, setFilterStatus] = useState('');
   const [filterPriority, setFilterPriority] = useState('');
   const [darkMode, setDarkMode] = useState(true);
+  const [activeNav, setActiveNav] = useState('all');
 
   const loadTasks = useCallback(async () => {
     setLoading(true);
@@ -32,7 +33,6 @@ export default function Dashboard() {
       setTasks(taskRes.data);
       setStats(statsRes.data);
     } catch {
-      // Token expired — go to login
       navigate('/login');
     } finally {
       setLoading(false);
@@ -51,18 +51,26 @@ export default function Dashboard() {
     navigate('/login');
   };
 
+  const handleNavClick = (nav) => {
+    setActiveNav(nav);
+    if (nav === 'all') { setFilterStatus(''); setFilterPriority(''); }
+    else if (nav === 'pending') { setFilterStatus('pending'); setFilterPriority(''); }
+    else if (nav === 'completed') { setFilterStatus('completed'); setFilterPriority(''); }
+    else if (nav === 'high') { setFilterStatus(''); setFilterPriority('high'); }
+  };
+
   return (
     <div className={`app-shell ${darkMode ? 'dark' : 'light'}`}>
 
-      {/* ── Sidebar ── */}
+      {/* ── Sidebar (Desktop) ── */}
       <aside className="sidebar">
         <div className="sb-logo">Task<span>Flow</span></div>
         <div className="sb-section">
           <div className="sb-label">Menu</div>
-          <button className="sb-item active">📋 All Tasks</button>
-          <button className="sb-item" onClick={() => setFilterStatus('pending')}>⏳ Pending</button>
-          <button className="sb-item" onClick={() => setFilterStatus('completed')}>✅ Completed</button>
-          <button className="sb-item" onClick={() => setFilterPriority('high')}>🔴 High Priority</button>
+          <button className={`sb-item ${activeNav === 'all' ? 'active' : ''}`} onClick={() => handleNavClick('all')}>📋 All Tasks</button>
+          <button className={`sb-item ${activeNav === 'pending' ? 'active' : ''}`} onClick={() => handleNavClick('pending')}>⏳ Pending</button>
+          <button className={`sb-item ${activeNav === 'completed' ? 'active' : ''}`} onClick={() => handleNavClick('completed')}>✅ Completed</button>
+          <button className={`sb-item ${activeNav === 'high' ? 'active' : ''}`} onClick={() => handleNavClick('high')}>🔴 High Priority</button>
         </div>
         <div className="sb-section" style={{ marginTop: 'auto', paddingBottom: 8 }}>
           <button className="sb-item" onClick={() => setDarkMode(!darkMode)}>
@@ -74,6 +82,17 @@ export default function Dashboard() {
 
       {/* ── Main ── */}
       <main className="main-content">
+
+        {/* Mobile Top Bar */}
+        <div className="mobile-topbar">
+          <div className="sb-logo" style={{ marginBottom: 0 }}>Task<span>Flow</span></div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button className="icon-btn" onClick={() => setDarkMode(!darkMode)} style={{ fontSize: 18 }}>
+              {darkMode ? '☀️' : '🌙'}
+            </button>
+            <button className="icon-btn" onClick={handleLogout} style={{ fontSize: 18 }}>🚪</button>
+          </div>
+        </div>
 
         {/* Header */}
         <div className="page-header">
@@ -117,7 +136,7 @@ export default function Dashboard() {
             <option value="low">Low</option>
           </select>
           {(search || filterStatus || filterPriority) && (
-            <button className="btn-secondary" onClick={() => { setSearch(''); setFilterStatus(''); setFilterPriority(''); }}>
+            <button className="btn-secondary" onClick={() => { setSearch(''); setFilterStatus(''); setFilterPriority(''); setActiveNav('all'); }}>
               Clear
             </button>
           )}
@@ -147,6 +166,30 @@ export default function Dashboard() {
           </div>
         )}
       </main>
+
+      {/* ── Mobile Bottom Nav ── */}
+      <nav className="mobile-nav">
+        <button className={`mobile-nav-item ${activeNav === 'all' ? 'active' : ''}`} onClick={() => handleNavClick('all')}>
+          <span>📋</span>
+          <span>All</span>
+        </button>
+        <button className={`mobile-nav-item ${activeNav === 'pending' ? 'active' : ''}`} onClick={() => handleNavClick('pending')}>
+          <span>⏳</span>
+          <span>Pending</span>
+        </button>
+        <button className={`mobile-nav-item ${activeNav === 'completed' ? 'active' : ''}`} onClick={() => handleNavClick('completed')}>
+          <span>✅</span>
+          <span>Done</span>
+        </button>
+        <button className="mobile-nav-item" onClick={openNew}>
+          <span>➕</span>
+          <span>New</span>
+        </button>
+        <button className={`mobile-nav-item ${activeNav === 'high' ? 'active' : ''}`} onClick={() => handleNavClick('high')}>
+          <span>🔴</span>
+          <span>High</span>
+        </button>
+      </nav>
 
       {/* Modal */}
       {modalOpen && <TaskModal task={editTask} onClose={closeModal} onSaved={handleSaved} />}
